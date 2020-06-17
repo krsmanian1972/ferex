@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon --exec babel-node src/index.js",
+    "remstart": "HTTPS=true HOST=139.59.94.248 nodemon --exec babel-node src/secure_index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
