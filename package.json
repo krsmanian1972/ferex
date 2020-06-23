@@ -2,9 +2,9 @@
   "name": "ferex",
   "version": "1.0.0",
   "description": "To Serve the Feris-UI, a React App, while acting as a Signaling Server",
-  "main": "index.js",
+  "main": "ferex.js",
   "scripts": {
-    "start": "node src/index.js",
+    "start": "node src/ferex.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
