@@ -4,17 +4,16 @@
   "description": "To Serve the Feris-UI, a React App, while acting as a Signaling Server",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon --exec babel-node src/index.js",
-    "remstart": "HTTPS=true HOST=139.59.94.248 nodemon --exec babel-node src/secure_index.js",
+    "start": "node src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "Raja Subramanian",
   "license": "MIT",
   "devDependencies": {
-    "@babel/core": "^7.10.2",
-    "@babel/node": "^7.10.1",
-    "@babel/preset-env": "^7.10.2",
+    "@babel/core": "^7.10.3",
+    "@babel/node": "^7.10.3",
+    "@babel/preset-env": "^7.10.3",
     "nodemon": "^2.0.4"
   },
   "dependencies": {

@@ -1,11 +1,10 @@
-import 'dotenv/config';
-
 const express = require('express');
 const https = require('http');
 const cors = require('cors');
 const signalServer = require('./signalServer'); 
 
-const bind_port = process.env.port;
+const bind_port = 3001;
+
 const app = express();
 app.use(cors());
 
