@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1593092530991" clover="3.2.0">
+  <project timestamp="1593092530991" name="All files">
+    <metrics statements="32" coveredstatements="32" conditionals="12" coveredconditionals="12" methods="7" coveredmethods="7" elements="51" coveredelements="51" complexity="0" loc="32" ncloc="32" packages="1" files="1" classes="1"/>
+    <file name="users.js" path="/Users/harinimaniam/workspace/ferex/src/lib/users.js">
+      <metrics statements="32" coveredstatements="32" conditionals="12" coveredconditionals="12" methods="7" coveredmethods="7"/>
+      <line num="8" count="1" type="stmt"/>
+      <line num="9" count="1" type="stmt"/>
+      <line num="12" count="1" type="stmt"/>
+      <line num="15" count="1" type="stmt"/>
+      <line num="17" count="1" type="stmt"/>
+      <line num="18" count="8" type="stmt"/>
+      <line num="19" count="8" type="stmt"/>
+      <line num="32" count="12" type="stmt"/>
+      <line num="33" count="12" type="stmt"/>
+      <line num="35" count="12" type="stmt"/>
+      <line num="49" count="1" type="stmt"/>
+      <line num="50" count="12" type="stmt"/>
+      <line num="51" count="12" type="stmt"/>
+      <line num="52" count="12" type="stmt"/>
+      <line num="54" count="12" type="cond" truecount="2" falsecount="0"/>
+      <line num="55" count="8" type="stmt"/>
+      <line num="57" count="12" type="stmt"/>
+      <line num="59" count="12" type="stmt"/>
+      <line num="61" count="12" type="stmt"/>
+      <line num="65" count="4" type="stmt"/>
+      <line num="68" count="3" type="stmt"/>
+      <line num="73" count="1" type="stmt"/>
+      <line num="74" count="7" type="cond" truecount="2" falsecount="0"/>
+      <line num="75" count="6" type="stmt"/>
+      <line num="77" count="6" type="stmt"/>
+      <line num="78" count="6" type="stmt"/>
+      <line num="79" count="6" type="cond" truecount="4" falsecount="0"/>
+      <line num="80" count="3" type="stmt"/>
+      <line num="88" count="1" type="stmt"/>
+      <line num="90" count="3" type="cond" truecount="4" falsecount="0"/>
+      <line num="91" count="1" type="stmt"/>
+      <line num="94" count="2" type="stmt"/>
+    </file>
+  </project>
+</coverage>

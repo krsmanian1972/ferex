@@ -9,12 +9,15 @@ const OK = 'ok';
 const NO = 'no';
 
 // The holder for id and the socket.
-const connections = {};
+const connections = new Map();
 
 // fuzzyId as Key and its Set of random ids 
 const tokens = new Map();
 
-
+exports.init = () => {
+  connections.clear();
+  tokens.clear();
+}
 
 /**
  * There is no guarantee that every socket will have unique ids
@@ -51,12 +54,33 @@ exports.create = async (socket, data) => {
   if (!tokens.has(fuzzyId)) {
     tokens.set(fuzzyId, new Set());
   }
-
   tokens.get(fuzzyId).add(id);
-  connections[id] = socket;
+
+  connections.set(id,socket);
 
   return id;
 };
+
+// Return the socket associated with the Id
+exports.get = (id) => connections.get(id);
+
+// Return the List of tokens created for the given fuzzyId
+exports.getTokens = (fuzzyId) => tokens.get(fuzzyId)
+
+
+// Delete the socket entry identified by the Id.
+// We need to remove the token entry as well.
+exports.remove = (id) => {
+  if (id) {
+    connections.delete(id);
+
+    const fuzzyId = id.split("~")[0];
+    let ids = tokens.get(fuzzyId);
+    if (ids && ids.has(id)) {
+      ids.delete(id)
+    }
+  }
+}
 
 /* return ok or no
   The function simply looks for an entry in the tokens map.  
@@ -70,21 +94,3 @@ exports.ping = (fuzzyId) => {
   return NO;
 };
 
-// Return the socket associated with the Id
-exports.get = (id) => connections[id];
-
-
-// Delete the socket entry identified by the Id.
-// We need to remove the token entry as well.
-exports.remove = (id) => {
-  if (id) {
-    delete connections[id];
-
-    const fuzzyId = id.split("~")[0];
-    let ids = tokens.get(fuzzyId);
-    if (ids && ids.has(id)) {
-      ids.delete(id)
-    }
-
-  }
-}
