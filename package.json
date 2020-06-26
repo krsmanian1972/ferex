@@ -5,7 +5,15 @@
   "main": "ferex.js",
   "scripts": {
     "start": "node src/ferex.js",
-    "test": "jest --watch --verbose"
+    "test": "jest --watch --verbose",
+    "coveralls": "jest --coverage && cat ./coverage/lcov.info | coveralls"
+  },
+  "jest": {
+    "collectCoverageFrom": [
+        "**/*.js",
+        "!data/keyMap.js",
+        "!/node_modules/"
+    ]
   },
   "keywords": [],
   "author": "Raja Subramanian",
