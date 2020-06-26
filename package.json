@@ -10,9 +10,7 @@
   },
   "jest": {
     "collectCoverageFrom": [
-        "**/*.js",
-        "!data/keyMap.js",
-        "!/node_modules/"
+      "src/lib/*.js"
     ]
   },
   "keywords": [],
@@ -26,6 +24,7 @@
   },
   "dependencies": {
     "cors": "^2.8.5",
+    "coveralls": "^3.1.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "jest": "^26.1.0",
