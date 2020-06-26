@@ -11,14 +11,13 @@ function initSocket(socket) {
   let id;
   socket
     .on('init', async (data) => {
-      console.log("Init received");
       id = await users.create(socket, data);
       console.log(id);
       socket.emit('token', { id });
     })
     .on('ding', (data) => {
-      const ans = users.ping(data.fuzzyId);
-      socket.emit('answer', { fuzzyId:data.fuzzyId, ans:ans });
+      const ans = users.ping(data);
+      socket.emit('answer', ans);
     })
     .on('joinSession',(data) => {
       const advice = liveSessions.joinSession(data,id);
@@ -46,6 +45,7 @@ function initSocket(socket) {
     })
     .on('disconnect', () => {
       users.remove(id);
+      liveSessions.disconnect(id);
       console.log(id, 'disconnected');
     });
 }

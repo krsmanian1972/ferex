@@ -1,11 +1,14 @@
+/**
+ * Run npm test -- --coverage
+ */
 import 'regenerator-runtime/runtime';
 
-var users = require("./users");
+const users = require("./users");
 
 describe("Maintain the List of connected socket ids", () => {
 
-    beforeEach(()=>{
-        users.init();
+    beforeEach(() => {
+        users.clear();
     });
 
     it("should emit a RandomID on create ", async () => {
@@ -17,7 +20,7 @@ describe("Maintain the List of connected socket ids", () => {
         expect(id).toBeDefined();
     });
 
-    it("should emit a random id with the fuzzy_id and name as its first and second segment", async () => {
+    it("should emit a RandomId with fuzzy_id and name as its first and second segment", async () => {
         const mockSocket = { socket: 1 };
         const fuzzyId = '9-9';
         const name = 'raja';
@@ -27,7 +30,7 @@ describe("Maintain the List of connected socket ids", () => {
         expect(id.split('~')[1]).toBe(name);
     });
 
-    it("should return the socket connection with the given id", async ()=>{
+    it("should return the socket connection with the given id", async () => {
         const fuzzyId1 = '9-9';
         const name1 = "raja";
         const mockSocket1 = { socket: 1 };
@@ -50,7 +53,7 @@ describe("Maintain the List of connected socket ids", () => {
         expect(connection.socket).toBe(2);
     })
 
-    it("should return undefined when no fuzzyId; either" , () => {
+    it("should return undefined when no fuzzyId; either", () => {
         expect(users.get(null)).toBeUndefined();
     })
 
@@ -69,7 +72,7 @@ describe("Maintain the List of connected socket ids", () => {
         expect(tokens.size).toBe(2);
     });
 
-    it("should remove the id from the connections and tokens", async()=>{
+    it("should remove the id from the connections and tokens", async () => {
 
         const fuzzyId1 = '9-9';
         const name1 = "raja";
@@ -83,17 +86,17 @@ describe("Maintain the List of connected socket ids", () => {
         expect(users.getTokens(fuzzyId1).size).toBe(2);
 
         users.remove(id2);
-        
+
         expect(users.get(id2)).toBeUndefined();
         expect(users.getTokens(fuzzyId1).size).toBe(1);
     })
 
-    it("should gracefull when the fuzzyeId is corrupted", async() => {
+    it("should be gracefull when the fuzzyId is corrupted", async () => {
 
         const fuzzyId1 = '9-9';
         const name1 = "raja";
         const mockSocket1 = { socket: 1 };
-        
+
         const id1 = await users.create(mockSocket1, { fuzzyId: fuzzyId1, name: name1 });
 
         // Removing null fuzzyId
@@ -108,18 +111,25 @@ describe("Maintain the List of connected socket ids", () => {
         users.remove(id1);
     })
 
-    it("should return Yes when pinging with a connected fuyzzId and No when pinging with an unknown", async ()=>{
+    it("should return Yes when pinging with a connected fuyzzId and No or Error when pinging with an unknown", async () => {
 
         const fuzzyId1 = '9-9';
         const name1 = "raja";
         const mockSocket1 = { socket: 1 };
-        
+
         const id1 = await users.create(mockSocket1, { fuzzyId: fuzzyId1, name: name1 });
 
-        expect(users.ping(fuzzyId1)).toBe("ok");
+        const pingData = {fuzzyId:fuzzyId1};
+        const answer = users.ping(pingData);
+        expect(answer.fuzzyId).toBe(fuzzyId1);
+        expect(answer.ans).toBe("ok");
+        
         users.remove(id1);
-        expect(users.ping(fuzzyId1)).toBe("no");
-        expect(users.ping(null)).toBe("no");
+
+        expect(users.ping(fuzzyId1).ans).toBe("no");
+   
+
+        expect(users.ping(null).ans).toBe("ERROR");
     })
 
 });
