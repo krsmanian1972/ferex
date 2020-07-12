@@ -1,7 +1,8 @@
 const io = require('socket.io');
 const users = require('./lib/users');
 const liveSessions = require('./lib/liveSessions');
-
+const fs = require('fs');
+const root ='/home/gskandha/ferex/canvas';
 /**
  * Initialize when a connection is made
  * 
@@ -43,11 +44,17 @@ function initSocket(socket) {
         receiver.emit('end');
       }
     })
+    .on('canvasupstream', async (data) => {
+      fs.writeFile(`${root}/${data.name}`, data.content, err => {if (err) throw err});
+    })
+
     .on('disconnect', () => {
       users.remove(id);
       liveSessions.disconnect(id);
       console.log(id, 'disconnected');
     });
+    
+    
 }
 
 module.exports = (server) => {
