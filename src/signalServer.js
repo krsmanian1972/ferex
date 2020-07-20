@@ -1,8 +1,10 @@
 const io = require('socket.io');
 const users = require('./lib/users');
 const liveSessions = require('./lib/liveSessions');
+
 const fs = require('fs');
-const root ='/home/gskandha/ferex/canvas';
+
+const ASSET_DIR = "/Users/harinimaniam/assets";
 /**
  * Initialize when a connection is made
  * 
@@ -20,9 +22,9 @@ function initSocket(socket) {
       const ans = users.ping(data);
       socket.emit('answer', ans);
     })
-    .on('joinSession',(data) => {
-      const advice = liveSessions.joinSession(data,id);
-      socket.emit('callAdvice',advice);
+    .on('joinSession', (data) => {
+      const advice = liveSessions.joinSession(data, id);
+      socket.emit('callAdvice', advice);
     })
     .on('request', (data) => {
       const receiver = users.get(data.to);
@@ -45,16 +47,17 @@ function initSocket(socket) {
       }
     })
     .on('canvasupstream', async (data) => {
-      fs.writeFile(`${root}/${data.name}`, data.content, err => {if (err) throw err});
+      const dir = `${ASSET_DIR}/${data.sessionUserFuzzyId}/board`;
+      fs.mkdirSync(dir, { recursive: true });
+      fs.writeFile(`${dir}/${data.name}`, data.content, err => { if (err) throw err });
     })
-
     .on('disconnect', () => {
       users.remove(id);
       liveSessions.disconnect(id);
       console.log(id, 'disconnected');
     });
-    
-    
+
+
 }
 
 module.exports = (server) => {
