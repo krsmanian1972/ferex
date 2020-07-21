@@ -4,7 +4,7 @@ const liveSessions = require('./lib/liveSessions');
 
 const fs = require('fs');
 
-const ASSET_DIR = "/Users/harinimaniam/assets";
+const SESSION_ASSET_DIR = "/Users/harinimaniam/assets/sessions";
 /**
  * Initialize when a connection is made
  * 
@@ -47,7 +47,7 @@ function initSocket(socket) {
       }
     })
     .on('canvasupstream', async (data) => {
-      const dir = `${ASSET_DIR}/${data.sessionUserFuzzyId}/board`;
+      const dir = `${SESSION_ASSET_DIR}/${data.sessionUserFuzzyId}/boards`;
       fs.mkdirSync(dir, { recursive: true });
       fs.writeFile(`${dir}/${data.name}`, data.content, err => { if (err) throw err });
     })
