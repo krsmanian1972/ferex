@@ -57,6 +57,11 @@ function initSocket(socket) {
       fs.mkdirSync(dir, { recursive: true });
       fs.writeFile(`${dir}/${data.name}`, data.content, err => { if (err) throw err });
     })
+    .on('sessionContent', async (data) => {
+      const dir = `${SESSION_ASSET_DIR}/${data.sessionUserFuzzyId}/content`;
+      fs.mkdirSync(dir, { recursive: true });
+      fs.writeFile(`${dir}/${data.fileName}`, data.content, err => { if (err) throw err });
+    })
     .on('disconnect', () => {
       users.remove(id);
       liveSessions.disconnect(id);
