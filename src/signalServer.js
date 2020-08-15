@@ -4,8 +4,8 @@ const liveSessions = require('./lib/liveSessions');
 
 const fs = require('fs');
 
-const SESSION_ASSET_DIR = "/Users/harinimaniam/assets/sessions";
-const PROGRAM_ASSET_DIR = "/Users/harinimaniam/assets/programs";
+const SESSION_ASSET_DIR = "/Users/pmpower/assets/sessions";
+const PROGRAM_ASSET_DIR = "/Users/pmpower/assets/programs";
 /**
  * Initialize when a connection is made
  * 
