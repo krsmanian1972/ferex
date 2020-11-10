@@ -6,7 +6,7 @@ const fs = require('fs');
 
 const SESSION_ASSET_DIR = "/Users/pmpower/assets/sessions";
 const PROGRAM_ASSET_DIR = "/Users/pmpower/assets/programs";
-const COACH_ASSET_DIR = "/Users/pmpower/assets/mentors";
+const USER_ASSET_DIR = "/Users/pmpower/assets/users";
 /**
  * Initialize when a connection is made
  * 
@@ -58,8 +58,8 @@ function initSocket(socket) {
       fs.mkdirSync(dir, { recursive: true });
       fs.writeFile(`${dir}/${data.name}`, data.content, err => { if (err) throw err });
     })
-    .on('coachContent', async (data) => {
-      const dir = `${COACH_ASSET_DIR}/${data.fuzzyId}`;
+    .on('userContent', async (data) => {
+      const dir = `${USER_ASSET_DIR}/${data.fuzzyId}`;
       fs.mkdirSync(dir, { recursive: true });
       fs.writeFile(`${dir}/${data.name}`, data.content, err => { if (err) throw err });
     })
