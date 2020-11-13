@@ -74,7 +74,21 @@ function initSocket(socket) {
       console.log(id, 'disconnected');
     });
 
+  /**
+   * Find the live sockets created for the "TO" fuzzyId.
+   * 
+   * If any found, dispatch the message to all of them.
+   *  
+   * The Receivers is an implementation of Set.
+   */
+  socket.on('sendTo', async (data) => {
 
+    const receivers = users.getSockets(data.to);
+    for (let receiver of receivers) {
+      receiver.emit('feedIn', { feed: data.feed });
+    }
+
+  });
 }
 
 module.exports = (server) => {

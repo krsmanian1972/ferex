@@ -132,4 +132,43 @@ describe("Maintain the List of connected socket ids", () => {
         expect(users.ping(null).ans).toBe("ERROR");
     })
 
+    it("Should return the matching sockets of a user identifed by its fuzzyId", async() => {
+
+        // Built two sockets for Raja
+        const fuzzyId = '9-9';
+        const name = "raja";
+
+        const mockSocket1 = { socket: 1 };
+        const mockSocket2 = { socket: 2 };
+        const mockSocketX = { socket: 3 };
+
+        const id1 = await users.create(mockSocket1, { fuzzyId: fuzzyId, name: name });
+        const id2 = await users.create(mockSocket2, { fuzzyId: fuzzyId, name: name });
+        const idX = await users.create(mockSocketX, { fuzzyId: fuzzyId, name: name });
+
+        // Build two sockets for Gopal
+        const fuzzyId2 = '1-1';
+        const name2 = "gopal";
+        const mockSocket3 = { socket: 3 };
+        const mockSocket4 = { socket: 4 };
+
+        const id3 = await users.create(mockSocket3, { fuzzyId: fuzzyId2, name: name2 });
+        const id4 = await users.create(mockSocket4, { fuzzyId: fuzzyId2, name: name2 });
+
+        // Check if raja's fuzzyId yield three sockets
+        const rajaSockets = users.getSockets(fuzzyId);
+        expect(rajaSockets.size).toBe(3);
+
+        // Testing Unknown user fuzzyId
+        const unknownUserSockets = users.getSockets('x-x');
+        expect(unknownUserSockets.size).toBe(0);
+
+        // Test to handle undefined userId
+        expect(users.getSockets().size).toBe(0);
+
+        // Now Check if Gopals's fuzzyId yield two sockets
+        const gopalSockets = users.getSockets(fuzzyId2);
+        expect(gopalSockets.size).toBe(2);
+    })
+
 });

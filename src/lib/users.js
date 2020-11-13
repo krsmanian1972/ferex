@@ -108,3 +108,23 @@ exports.clear = () => {
   connections.clear();
   tokens.clear();
 }
+
+exports.getSockets = (fuzzyId) => {
+
+  const sockets = new Set();
+
+  if(!fuzzyId) {
+    return sockets;
+  }
+
+  if (tokens.has(fuzzyId) && tokens.get(fuzzyId).size > 0) {
+    const ids = tokens.get(fuzzyId);
+
+    for (let id of ids) {
+      sockets.add(connections.get(id));
+    }
+      
+  }
+
+  return sockets;
+}
