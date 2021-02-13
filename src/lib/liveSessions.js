@@ -1,4 +1,7 @@
 const sessionGuides = new Map();
+/*
+*  sessionID : (Map (userFuzzId : socketID))
+*/
 const sessionMembers = new Map();
 const runningSessions = new Map();
 const socketSessions = new Map();
@@ -14,14 +17,14 @@ const MEMBER = "member"
 const PERMITTED_ROLES = new Set([GUIDE, COACH, MEMBER]);
 
 /**
- * The Session Data should contain the 
+ * The Session Data should contain the
  * sessionId,
- * user fuzzyId and 
+ * user fuzzyId and
  * Role of the user who just joined the session
- * 
- * 
- * @param {*} sessionData 
- * @param {*} socketId 
+ *
+ *
+ * @param {*} sessionData
+ * @param {*} socketId
  */
 exports.joinSession = (sessionData, socketId) => {
 
@@ -31,22 +34,34 @@ exports.joinSession = (sessionData, socketId) => {
 
     const sessionId = sessionData.sessionId;
     const role = sessionData.role;
+    const userFuzzyId = sessionData.fuzzyId;
 
     socketSessions.set(socketId, sessionId);
 
     if (role === GUIDE || role === COACH) {
         if(sessionGuides.has(sessionId)) {
             const gSocketId = sessionGuides.get(sessionId).socketId;
-            socketSessions.delete(gSocketId); 
+            socketSessions.delete(gSocketId);
         }
         sessionGuides.set(sessionId, { ...sessionData, socketId: socketId });
     }
     else {
         if(sessionMembers.has(sessionId)) {
-            const mSocketId = sessionMembers.get(sessionId).socketId;
-            socketSessions.delete(mSocketId); 
+            //const mSocketId = sessionMembers.get(sessionId).socketId;
+            //socketSessions.delete(mSocketId);
+            var sessionMemberData = sessionMembers.get(sessionId);
+            if(sessionMemberData.has(userFuzzyId)) {
+              const mSocketId = sessionMemberData.get(userFuzzyId);
+              socketSessions.delete(mSocketId);
+            }
+            sessionMemberData.set(userFuzzyId, socketId);
+            sessionMembers.set(sessionId, sessionMemberData);
+
+
         }
-        sessionMembers.set(sessionId, { ...sessionData, socketId: socketId });
+        var sessionMember = new Map();
+        sessionMember.set(userFuzzyId, socketId);
+        sessionMembers.set(sessionId, sessionMember);
     }
 
     const advice = buildAdvice(sessionId);
@@ -75,12 +90,16 @@ exports.clear = (sessionId) => {
     }
 
     if (sessionMembers.has(sessionId)) {
-        const mSocketId = sessionMembers.get(sessionId).socketId;
-        socketSessions.delete(mSocketId);
+        //const mSocketId = sessionMembers.get(sessionId).socketId;
+        const sessionMemberMap = sessionMembers.get(sessionId);
+        for (let [user, socket] of sessionMemberMap) {
+          socketSessions.delete(socket);
+        }
         sessionMembers.delete(sessionId);
+        runningSessions.delete(sessionId);
+
     }
 
-    runningSessions.delete(sessionId);
 }
 
 exports.disconnect = (socketId) => {
@@ -131,7 +150,7 @@ function isValid(sessionData) {
 /**
  * Return a suitable advice as a result for this join action,
  * which the socket client receivers may levarage to take action
- * 
+ *
  */
 function buildAdvice(sessionId) {
     const hasGuide = sessionGuides.has(sessionId);
@@ -146,7 +165,13 @@ function buildAdvice(sessionId) {
     }
 
     const guideSocketId = sessionGuides.get(sessionId).socketId;
-    const memberSocketId = sessionMembers.get(sessionId).socketId;
+    //const memberSocketId = sessionMembers.get(sessionId).socketId;
+    const sessionMemberData = sessionMembers.get(sessionId);
+    var guestSocketId = [];
+    for (let [user, socket] of sessionMemberData) {
+      guestSocketId.push(socket);
+    }
+    //const memberSocketId = sessionMembers.get(sessionId).socketId;
 
-    return { sessionId: sessionId, status: 'ok', reason: "Ready", guideSocketId: guideSocketId, memberSocketId: memberSocketId };
+    return { sessionId: sessionId, status: 'ok', reason: "Ready", guideSocketId: guideSocketId, memberSocketId: guestSocketId };
 }
