@@ -1,12 +1,12 @@
 const sessionGuides = new Map();
 /*
-*  sessionID : (Map (userFuzzId : socketID))
+*  sessionID : (Map (userId : socketID))
 */
 const sessionMembers = new Map();
 const runningSessions = new Map();
 const socketSessions = new Map();
 
-const ERROR = { status: 'no', reason: "The joiner is neither a Guide nor a Member Or has a valid session Id" };
+const ERROR = { status: 'no', reason: "The joiner is neither a Guide nor a Member Or has a valid session Id Or has valid user Id" };
 const NO_MEMBER = { status: 'no', reason: "Awaiting Member" };
 const NO_GUIDE = { status: 'no', reason: "Awaiting Guide" };
 
@@ -19,7 +19,7 @@ const PERMITTED_ROLES = new Set([GUIDE, COACH, MEMBER]);
 /**
  * The Session Data should contain the
  * sessionId,
- * user fuzzyId and
+ * user (fuzzy) Id and
  * Role of the user who just joined the session
  *
  *
@@ -32,36 +32,19 @@ exports.joinSession = (sessionData, socketId) => {
         return ERROR;
     }
 
-    const sessionId = sessionData.sessionId;
     const role = sessionData.role;
-    const userFuzzyId = sessionData.fuzzyId;
-
+    const sessionId = sessionData.sessionId;
     socketSessions.set(socketId, sessionId);
 
     if (role === GUIDE || role === COACH) {
-        if(sessionGuides.has(sessionId)) {
+        if (sessionGuides.has(sessionId)) {
             const gSocketId = sessionGuides.get(sessionId).socketId;
             socketSessions.delete(gSocketId);
         }
         sessionGuides.set(sessionId, { ...sessionData, socketId: socketId });
     }
     else {
-        if(sessionMembers.has(sessionId)) {
-            //const mSocketId = sessionMembers.get(sessionId).socketId;
-            //socketSessions.delete(mSocketId);
-            var sessionMemberData = sessionMembers.get(sessionId);
-            if(sessionMemberData.has(userFuzzyId)) {
-              const mSocketId = sessionMemberData.get(userFuzzyId);
-              socketSessions.delete(mSocketId);
-            }
-            sessionMemberData.set(userFuzzyId, socketId);
-            sessionMembers.set(sessionId, sessionMemberData);
-
-
-        }
-        var sessionMember = new Map();
-        sessionMember.set(userFuzzyId, socketId);
-        sessionMembers.set(sessionId, sessionMember);
+        captureMemberSocket(sessionData, socketId);
     }
 
     const advice = buildAdvice(sessionId);
@@ -71,6 +54,28 @@ exports.joinSession = (sessionData, socketId) => {
     }
 
     return advice;
+}
+
+function captureMemberSocket(sessionData, socketId) {
+
+    const sessionId = sessionData.sessionId;
+    const userId = sessionData.userId;
+
+    var sessionMemberData = null;
+
+    if (sessionMembers.has(sessionId)) {
+        sessionMemberData = sessionMembers.get(sessionId);
+
+        if (sessionMemberData.has(userId)) {
+            const mSocketId = sessionMemberData.get(userId);
+            socketSessions.delete(mSocketId);
+        }
+    }
+    else {
+        sessionMemberData = new Map();
+        sessionMembers.set(sessionId, sessionMemberData);
+    }
+    sessionMemberData.set(userId, socketId);
 }
 
 exports.isRunning = (sessionId) => {
@@ -90,14 +95,12 @@ exports.clear = (sessionId) => {
     }
 
     if (sessionMembers.has(sessionId)) {
-        //const mSocketId = sessionMembers.get(sessionId).socketId;
         const sessionMemberMap = sessionMembers.get(sessionId);
         for (let [user, socket] of sessionMemberMap) {
-          socketSessions.delete(socket);
+            socketSessions.delete(socket);
         }
         sessionMembers.delete(sessionId);
         runningSessions.delete(sessionId);
-
     }
 
 }
@@ -144,6 +147,10 @@ function isValid(sessionData) {
         return false;
     }
 
+    if(!sessionData.userId) {
+        return false;
+    }
+
     return true;
 }
 
@@ -165,13 +172,6 @@ function buildAdvice(sessionId) {
     }
 
     const guideSocketId = sessionGuides.get(sessionId).socketId;
-    //const memberSocketId = sessionMembers.get(sessionId).socketId;
-    const sessionMemberData = sessionMembers.get(sessionId);
-    var guestSocketId = [];
-    for (let [user, socket] of sessionMemberData) {
-      guestSocketId.push(socket);
-    }
-    //const memberSocketId = sessionMembers.get(sessionId).socketId;
-
-    return { sessionId: sessionId, status: 'ok', reason: "Ready", guideSocketId: guideSocketId, memberSocketId: guestSocketId };
+    const members = sessionMembers.get(sessionId);
+    return { sessionId: sessionId, status: 'ok', reason: "Ready", guideSocketId: guideSocketId, members: members };
 }
