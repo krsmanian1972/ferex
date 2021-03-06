@@ -7,9 +7,10 @@ const fs = require('fs');
 const SESSION_ASSET_DIR = "/Users/pmpower/assets/sessions";
 const PROGRAM_ASSET_DIR = "/Users/pmpower/assets/programs";
 const USER_ASSET_DIR = "/Users/pmpower/assets/users";
+
 /**
  * Initialize when a connection is made
- * 
+ *
  * @param {SocketIO.Socket} socket
  */
 function initSocket(socket) {
@@ -26,6 +27,7 @@ function initSocket(socket) {
     })
     .on('joinSession', (data) => {
       const advice = liveSessions.joinSession(data, id);
+      console.log(advice);
       socket.emit('callAdvice', advice);
     })
     .on('request', (data) => {
@@ -53,6 +55,24 @@ function initSocket(socket) {
       fs.mkdirSync(dir, { recursive: true });
       fs.writeFile(`${dir}/${data.name}`, data.content, err => { if (err) throw err });
     })
+    .on('usPaint', (data) => {
+      console.log("Paint Up Stream");
+      const advice = liveSessions.getSessionSocket(data.sessionId);
+      for (let [user, socket] of advice.members) {
+         const receivers = users.getSockets(user);
+         for (let receiver of receivers) {
+           if(data.sessionUserFuzzyId === user){
+           }
+           else{
+               receiver.emit('dsPaint', {data: data});
+           }
+         }
+      }
+      var guideSocket = users.get(advice.guideSocketId);
+      console.log("DSPAINT :: Sending to Guide");
+      guideSocket.emit('dsPaint', {data: data});
+    })
+
     .on('programContent', async (data) => {
       const dir = `${PROGRAM_ASSET_DIR}/${data.fuzzyId}/about`;
       fs.mkdirSync(dir, { recursive: true });
@@ -76,9 +96,9 @@ function initSocket(socket) {
 
   /**
    * Find the live sockets created for the "TO" fuzzyId.
-   * 
+   *
    * If any found, dispatch the message to all of them.
-   *  
+   *
    * The Receivers is an implementation of Set.
    */
   socket.on('sendTo', async (data) => {

@@ -175,3 +175,9 @@ function buildAdvice(sessionId) {
     const members = sessionMembers.get(sessionId);
     return { sessionId: sessionId, status: 'ok', reason: "Ready", guideSocketId: guideSocketId, members: members };
 }
+
+exports.getSessionSocket = (sessionId) => {
+
+    const sessionData = buildAdvice(sessionId);
+    return sessionData;
+}
