@@ -1,3 +1,6 @@
+/**
+ * We store the userData if the user is a coach for the session
+ */
 const sessionGuides = new Map();
 /*
 *  sessionID : (Map (userId : socketID))
@@ -147,7 +150,7 @@ function isValid(sessionData) {
         return false;
     }
 
-    if(!sessionData.userId) {
+    if (!sessionData.userId) {
         return false;
     }
 
@@ -176,8 +179,36 @@ function buildAdvice(sessionId) {
     return { sessionId: sessionId, status: 'ok', reason: "Ready", guideSocketId: guideSocketId, members: members };
 }
 
-exports.getSessionSocket = (sessionId) => {
+/**
+ * The Guide map of a given session id has both the socket id and the user Id.
+ *
+ * The members of a session is a map of userId to socketId
+ * 
+ * We return a map of peer user Id along with its socket of a given session
+ * except the givenUserId. 
+ * 
+ * @param {*} sessionId 
+ * @param {*} givenUserId 
+ */
+exports.getPeers = (sessionId, givenUserId) => {
+    const peerSocketIds = new Map();
 
-    const sessionData = buildAdvice(sessionId);
-    return sessionData;
+    const guideData = sessionGuides.get(sessionId);
+    if (guideData && guideData.userId !== givenUserId) {
+        peerSocketIds.set(guideData.userId,guideData.socketId);
+    }
+
+    const members = sessionMembers.get(sessionId);
+    if (!members) {
+        return peerSocketIds;
+    }
+
+    for (let [userId, socketId] of members) {
+        if (givenUserId === userId) {
+            continue;
+        }
+        peerSocketIds.set(userId,socketId);
+    }
+
+    return peerSocketIds;
 }

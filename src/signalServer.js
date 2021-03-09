@@ -27,7 +27,6 @@ function initSocket(socket) {
     })
     .on('joinSession', (data) => {
       const advice = liveSessions.joinSession(data, id);
-      console.log(advice);
       socket.emit('callAdvice', advice);
     })
     .on('request', (data) => {
@@ -92,20 +91,17 @@ function initSocket(socket) {
 
   });
 
-  socket.on('usPaint', (data) => {
-    const advice = liveSessions.getSessionSocket(data.sessionId);
-    for (let [user, socket] of advice.members) {
-       const receivers = users.getSockets(user);
-       for (let receiver of receivers) {
-         if(data.sessionUserFuzzyId === user){
-         }
-         else{
-             receiver.emit('dsPaint', {data: data});
-         }
-       }
+  socket.on('upstreamPaint', (data) => {
+
+    const peerMap = liveSessions.getPeers(data.sessionId, data.userId);
+
+    for (let [userId, socketId] of peerMap) {
+      const socket = users.get(socketId);
+      if (socket) {
+        socket.emit('downstreamPaint', { data: data });
+      }
     }
-    var guideSocket = users.get(advice.guideSocketId);
-    guideSocket.emit('dsPaint', {data: data});
+
   });
 
 }

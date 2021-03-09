@@ -150,5 +150,44 @@ describe("Offering advice about a given session", () => {
     it("should be graceful, when disconnection without any join events", () => {
         expect(liveSessions.disconnect(null)).toBe(false);
         expect(liveSessions.disconnect("1-1~Raja~1235")).toBe(false);
-    })
+    });
+
+    it("should return a map of userId to socketId of a session, except the given userId. This map is the peer socket Id",() =>{
+
+        const sessionId = 24;
+        const anotherSessionId = 37;
+
+        liveSessions.clear(sessionId);
+        liveSessions.clear(anotherSessionId);
+
+        const userId1 = '1-1-Gopal';
+        const session1 = { sessionId: sessionId, role: "guide", userId: userId1 };
+        const socketId1 = '1-1~Gopal~1234';
+        liveSessions.joinSession(session1, socketId1);
+
+        const userId2 = '1-1-Raja';
+        const session2 = { sessionId: sessionId, role: "member", userId: userId2 };
+        const socketId2 = '1-1~Raja~1235'
+        liveSessions.joinSession(session2, socketId2);
+
+        const userId3 = '1-1-Skanda';
+        const session3 = { sessionId: sessionId, role: "member", userId: userId3 };
+        const socketId3 = '1-1~Skanda~1236'
+        liveSessions.joinSession(session3, socketId3);
+
+        const userId4 = '7-7-Bootham';
+        const session4 = { sessionId: anotherSessionId, role: "member", userId: userId4 };
+        const socketId4 = '7-7~Bootham~1236'
+        liveSessions.joinSession(session4, socketId4);
+
+        const peerMap = liveSessions.getPeers(sessionId,userId2);
+
+        expect(peerMap.get(userId1)).toBe(socketId1);
+        expect(peerMap.get(userId3)).toBe(socketId3);
+        expect(peerMap.has(userId2)).toBe(false);
+
+        const anotherPeerMap = liveSessions.getPeers(session4,userId4);
+        expect(peerMap.has(userId4)).toBe(false);
+
+    });
 });
