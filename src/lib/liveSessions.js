@@ -41,6 +41,7 @@ exports.joinSession = (sessionData, socketId) => {
 
     if (role === GUIDE || role === COACH) {
         if (sessionGuides.has(sessionId)) {
+            // Delete any previous sockets
             const gSocketId = sessionGuides.get(sessionId).socketId;
             socketSessions.delete(gSocketId);
         }
@@ -160,7 +161,8 @@ function isValid(sessionData) {
 /**
  * Return a suitable advice as a result for this join action,
  * which the socket client receivers may levarage to take action
- *
+ * 
+ * The ES5 Map implementation of MemberSocketMap needs to be carfully serialized.
  */
 function buildAdvice(sessionId) {
     const hasGuide = sessionGuides.has(sessionId);
@@ -176,7 +178,10 @@ function buildAdvice(sessionId) {
 
     const guideSocketId = sessionGuides.get(sessionId).socketId;
     const members = sessionMembers.get(sessionId);
-    return { sessionId: sessionId, status: 'ok', reason: "Ready", guideSocketId: guideSocketId, members: members };
+
+    const serialized = JSON.stringify(Array.from(members.entries()));
+
+    return { sessionId: sessionId, status: 'ok', reason: "Ready", guideSocketId: guideSocketId, members: serialized };
 }
 
 /**

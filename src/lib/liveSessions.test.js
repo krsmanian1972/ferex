@@ -86,8 +86,10 @@ describe("Offering advice about a given session", () => {
         expect(advice3.sessionId).toBe(sessionId);
         expect(advice3.reason).toBe("Ready");
         expect(advice3.status).toBe("ok");
-        expect(advice3.members.get(userId2)).toBe(socketId2);
-        expect(advice3.members.get(userId3)).toBe(socketId3);
+
+        let members = new Map(JSON.parse(advice3.members));
+        expect(members.get(userId2)).toBe(socketId2);
+        expect(members.get(userId3)).toBe(socketId3);
 
         expect(liveSessions.isRunning(sessionId)).toBe(true);
         expect(liveSessions.count()).toBe(1);
