@@ -91,6 +91,10 @@ function initSocket(socket) {
 
   });
 
+  /**
+   * to dispatch the connected peers about the changes to the canvas elements
+   * and hence its state
+   */
   socket.on('upstreamPaint', (data) => {
 
     const peerMap = liveSessions.getPeers(data.sessionId, data.userId);
@@ -102,6 +106,21 @@ function initSocket(socket) {
       }
     }
 
+  });
+
+  /**
+   * When the owner (coach) preferred to show a different widget to the
+   * member.
+   */
+  socket.on('artifactChanged', (data) => {
+    const peerMap = liveSessions.getPeers(data.sessionId, data.userId);
+
+    for (let [userId, socketId] of peerMap) {
+      const socket = users.get(socketId);
+      if (socket) {
+        socket.emit('showArtifact', data );
+      }
+    }
   });
 
 }
