@@ -50,9 +50,9 @@ function initSocket(socket) {
       }
     })
     .on('canvasupstream', async (data) => {
-      const dir = `${SESSION_ASSET_DIR}/${data.sessionUserFuzzyId}/boards`;
+      const dir = `${SESSION_ASSET_DIR}/${data.sessionId}/boards`;
       fs.mkdirSync(dir, { recursive: true });
-      fs.writeFile(`${dir}/${data.name}`, data.content, err => { if (err) throw err });
+      fs.writeFile(`${dir}/${data.name}`, JSON.stringify(data.content), err => { if (err) throw err });
     })
     .on('programContent', async (data) => {
       const dir = `${PROGRAM_ASSET_DIR}/${data.fuzzyId}/about`;
@@ -102,7 +102,7 @@ function initSocket(socket) {
     for (let [userId, socketId] of peerMap) {
       const socket = users.get(socketId);
       if (socket) {
-        socket.emit('downstreamPaint', { data: data });
+        socket.emit('downstreamPaint', data);
       }
     }
 
